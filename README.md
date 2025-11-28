@@ -1,4 +1,4 @@
-# Igitur an unofficial Python Library for Gaudeam
+# Igitur an unofficial CLI Tool and Python Library for Gaudeam
 
 ## Install Dependencies
 
