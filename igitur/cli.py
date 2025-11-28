@@ -7,7 +7,7 @@ from pathlib import Path
 import sys
 logging.basicConfig(level=logging.INFO)
 from .core import IgiturError
-from .drive import GaudeamDriveFolder
+from .drive import GaudeamDriveFolder, GaudeamResizedImageUploader
 
 SESSION_PATH = Path.home() / ".igitur_session"
 
@@ -45,6 +45,33 @@ def ensure_logged_in() -> GaudeamSession:
         raise IgiturError("Session is invalid. Please login again.")
     return session
 
+def download(folder_id: str, destination: Path):
+    session = ensure_logged_in()
+    folder = GaudeamDriveFolder(session, folder_id)
+    folder.download(destination)
+    return 0
+
+def upload(folder_id: str, source: Path):
+    session = ensure_logged_in()
+    folder = GaudeamDriveFolder(session, folder_id)
+    if source.exists() is False:
+        raise IgiturError(f"Source path '{source}' does not exist.")
+
+    if source.is_file():
+        folder.upload_file(source)
+    elif source.is_dir():
+        folder.upload_folder(source)
+    return 0
+
+def upload_compressed_images(session: GaudeamSession, folder_id: str, source: Path):
+    if source.exists() is False or source.is_dir() is False:
+        raise IgiturError(f"Source path '{source}' does not exist or is not a directory.")
+
+    folder = GaudeamDriveFolder(session, folder_id)
+    uploader = GaudeamResizedImageUploader()
+    uploader.upload_folder_resized(source, folder)
+    return 0
+
 def main():
     parser = argparse.ArgumentParser(
         prog="igitur",
@@ -52,7 +79,7 @@ def main():
     )
     subparsers = parser.add_subparsers(dest="command", required = True)
 
-    # login command
+    # login comma
     login_parser = subparsers.add_parser(
         "login",
         help="Login to Gaudeam with email and password."
@@ -64,9 +91,19 @@ def main():
     
     logout_parser = subparsers.add_parser("logout", help="Logout and delete session.")
     
-    download_parser = subparsers.add_parser("download-folder", help="Download files from a Gaudeam folder.")
+    help_parser = subparsers.add_parser("help", help="Show help message.")
+    
+    download_parser = subparsers.add_parser("download", help="Download files from a Gaudeam folder.")
     download_parser.add_argument("folder_id", help="ID of the Gaudeam folder to download from.")
     download_parser.add_argument("-d", "--destination", help="Destination directory to save files.", default=".")
+    
+    upload_parser = subparsers.add_parser("upload", help="Upload files or the content of a folder to a Gaudeam folder.")
+    upload_parser.add_argument("folder_id", help="ID of the Gaudeam folder to upload to.")
+    upload_parser.add_argument("source", help="Path to the file or folder to upload.")
+
+    upload_image_parser = subparsers.add_parser("upload-images", help="Upload a folder and compress all images before uploading to a Gaudeam folder.")
+    upload_image_parser.add_argument("folder_id", help="ID of the Gaudeam folder to upload to.")
+    upload_image_parser.add_argument("source", help="Path to the folder containing images to upload.")
 
     # Enable tab completion
     argcomplete.autocomplete(parser)
@@ -84,12 +121,20 @@ def main():
 
         elif args.command == "status":
             status()
+
+        elif args.command == "download":
+            download(args.folder_id, Path(args.destination))
+
+        elif args.command == "upload":
+            upload(args.folder_id, Path(args.source))
         
-        elif args.command == "download-folder":
+        elif args.command == "upload-images":
             session = ensure_logged_in()
-            folder = GaudeamDriveFolder(session, args.folder_id)
-            destination_path = Path(args.destination)
-            folder.download(destination_path)
+            upload_compressed_images(session, args.folder_id, Path(args.source))
+
+        elif args.command is None or args.command == "help":
+            parser.print_help()
+            sys.exit(1)
     except IgiturError as e:
         print(e, file=sys.stderr)
         sys.exit(1)

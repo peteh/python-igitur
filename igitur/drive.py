@@ -54,9 +54,10 @@ class GaudeamDriveFolder:
         Returns:
             GaudeamDriveFolder: The newly created folder
         """
+        logging.debug(json.dumps(self._properties, indent=4))
         owner_type = self._properties["owner_type"]
         owner_id_from_parent = self._properties["owner_id"]
-
+        logging.debug(f"Creating sub-folder '{name}' in folder '{self.get_name()}' owned by '{owner_type}' with owner ID '{owner_id_from_parent}'")
         data = {
             "inode": {
                 "description": description,
@@ -72,6 +73,7 @@ class GaudeamDriveFolder:
             }
         }
         # parent owner is a group, we copy the settings
+        
         if owner_type == "Group":
             restrict_to_id_from_parent = self._properties["restrict_to"]["id"]
             data["inode"]["owner_type"] = "Group"
@@ -79,6 +81,9 @@ class GaudeamDriveFolder:
         # parent owner is a Member, we copy member settings
         elif owner_type == "GroupMember":
             data["inode"]["owner_type"] = "GroupMember"
+            data["inode"]["restrict_to_id"] = None
+        elif owner_type is None:
+            data["inode"]["owner_type"] = None
             data["inode"]["restrict_to_id"] = None
         else:
             raise IgiturError("cannot create file as parent is not owned by GroupMember or Group")

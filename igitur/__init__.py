@@ -1,5 +1,6 @@
-from .gaudeam import GaudeamCalendar, GaudeamMembers, GaudeamEvent
+from .gaudeam import GaudeamCalendar, GaudeamEvent
 from .session import GaudeamSession
+from .members import GaudeamMembers
 from .drive import GaudeamDriveFolder, GaudeamDrive, GaudeamDriveFile
 __all__ = ["GaudeamCalendar",
            "GaudeamMembers",
