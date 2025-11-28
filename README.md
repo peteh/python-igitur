@@ -20,13 +20,13 @@ igitur login
 
 ### Check Login Status
 
-To check if your session status you can use the `status` command. 
+To check if your session status you can use the `status` command.
 
 ```bash
 igitur status
 ```
 
-The result will show you what instance you are logged in to and your user account. 
+The result will show you what instance you are logged in to and your user account.
 
 ```bash
 Logged in as x@y.de at https://instance.gaudeam.de
@@ -34,7 +34,7 @@ Logged in as x@y.de at https://instance.gaudeam.de
 
 ### Logout
 
-To log out, just use the `logout` command. 
+To log out, just use the `logout` command.
 
 ```bash
 igitur logout
@@ -42,11 +42,11 @@ igitur logout
 
 ### Download Folders
 
-You can download the full content of a folder directly using the `download` command. To get the actual folder id, open the folder in your browser and check the URL: 
+You can download the full content of a folder directly using the `download` command. To get the actual folder id, open the folder in your browser and check the URL:
 
 `https://instance.gaudeam.de/drive/folders/FOLDERID`
 
-Now you can download using following command: 
+Now you can download using following command:
 
 ```bash
 igitur download FOLDERID DESTINATIONPATH
@@ -85,6 +85,7 @@ igitur upload-images FOLDERID ./local/source/folder/
 ```
 
 ## Development
+
 To develop on the app, you can install it as a in-place package which will reflect all code changes directly in your virtual environment.
 
 ```bash
