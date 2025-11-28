@@ -24,5 +24,8 @@ classifiers = [
     "Operating System :: OS Independent"
 ]
 
+[tool.setuptools.packages.find]
+where = ["src"]
+
 [project.scripts]
 igitur = "igitur.cli:main"
