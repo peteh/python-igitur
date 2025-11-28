@@ -1,3 +1,28 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=61", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "igitur"
+version = "0.1.0"
+description = "A test CLI"
+authors = [{name = "Peteh"}]
+license = {text = "GPL-3.0-or-later"}
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "requests",
+    "beautifulsoup4",
+    "Pillow",
+    "argcomplete"
+]
+classifiers = [
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    "Operating System :: OS Independent"
+]
+
+[project.scripts]
+igitur = "igitur.cli:main"
