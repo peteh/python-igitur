@@ -1,11 +1,11 @@
 # Igitur an unofficial CLI Tool and Python Library for Gaudeam
 
-## Install Dependencies
+## Installation
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements
+pip install git+https://github.com/peteh/python-igitur.git
 ```
 
 ## Usage
