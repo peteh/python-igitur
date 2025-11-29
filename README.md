@@ -112,11 +112,9 @@ The `download-event-media` command can download all media attached to an event. 
 
 To get the event id open the event page from gaudeam and copy the number from the link: 
 
-`https://ulmia-stuttgart.gaudeam.de/events/EVENTID`
+`https://instance.gaudeam.de/events/EVENTID`
 
 ## Download Event Media from the last x Days
-
-## Download Event Media
 
 The `download-event-media-last-days` command will download the latest event galleries from the past x days. For each event a subfolder with the event date and name is created.
 
