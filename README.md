@@ -106,10 +106,34 @@ The `upload-images` command is a special function to create galleries while uplo
 igitur upload-images FOLDERID ./local/source/folder/
 ```
 
-## Development
+## Download Event Media
 
-To develop on the app, you can install it as a in-place package which will reflect all code changes directly in your virtual environment.
+The `download-event-media` command can download all media attached to an event. A subfolder is created for each uploader that uploaded media to the event.
+
+To get the event id open the event page from gaudeam and copy the number from the link: 
+
+`https://ulmia-stuttgart.gaudeam.de/events/EVENTID`
+
+## Download Event Media from the last x Days
+
+## Download Event Media
+
+The `download-event-media-last-days` command will download the latest event galleries from the past x days. For each event a subfolder with the event date and name is created.
 
 ```bash
+igitur download-event-media-days DAYS ./download/folder
+```
+
+## Development
+
+To develop on the app, you can install it as an in-place package which will reflect all code changes directly in your virtual environment. 
+
+Clone the repo and run this from the root folder:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
 pip install -e .
 ```
+
+Then you can modify the code in the repository and it's automatically reflected in your virtual environment.

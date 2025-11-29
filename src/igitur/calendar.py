@@ -122,6 +122,7 @@ class GaudeamEvent():
                 if save_path.exists():
                     logging.info(f"Skipping {save_path}: File already exists")
                     continue
+                logging.info(f"Downloading media '{file_name}' from post by '{creator_name}' to '{save_path}'")
                 media.download(save_path)
 
     def get_start_datetime(self) -> datetime.datetime:

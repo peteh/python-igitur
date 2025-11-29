@@ -1,6 +1,7 @@
 import argcomplete
 import argparse
 import logging
+from datetime import datetime, timedelta
 from getpass import getpass
 from igitur import GaudeamSession
 from pathlib import Path
@@ -8,6 +9,7 @@ import sys
 logging.basicConfig(level=logging.INFO)
 from .core import IgiturError
 from .drive import GaudeamDriveFolder, GaudeamResizedImageUploader
+from .calendar import GaudeamEvent, GaudeamCalendar
 
 SESSION_PATH = Path.home() / ".igitur_session"
 
@@ -50,6 +52,32 @@ def download(folder_id: str, destination: Path):
     folder = GaudeamDriveFolder(session, folder_id)
     folder.download(destination)
     return 0
+
+def download_event_media(event_id: str, destination: Path):
+    session = ensure_logged_in()
+    event = GaudeamEvent(session, event_id)
+    event.download_media(destination)
+    return 0
+
+def download_event_media_days(days: int,  destination: Path):
+    session = ensure_logged_in()
+    calendar = GaudeamCalendar(session)
+    
+    # Get a time range from now to 14 days ago
+    today = datetime.now()
+    past = today - timedelta(days=14)
+
+    # get all events in the time frame
+    events = calendar.global_calendar(past, today)
+
+    # download all media files for each event into a folder named with the event date and title with subfolders for each uploader
+    base_path = Path("./downloaded_events/")
+    for event in events:
+        date_str = event.get_start_datetime().strftime("%Y-%m-%d")
+        folder_name = f"{date_str} {event.get_title()}"
+        event_path = base_path / folder_name
+        event.download_media(event_path)
+
 
 def upload(folder_id: str, source: Path):
     session = ensure_logged_in()
@@ -95,7 +123,15 @@ def main():
     
     download_parser = subparsers.add_parser("download", help="Download files from a Gaudeam folder.")
     download_parser.add_argument("folder_id", help="ID of the Gaudeam folder to download from.")
-    download_parser.add_argument("-d", "--destination", help="Destination directory to save files.", default=".")
+    download_parser.add_argument("destination", help="Destination directory to save files.", default=".")
+    
+    download_event_media_parser = subparsers.add_parser("download-event-media", help="Download all media files from a Gaudeam event.")
+    download_event_media_parser.add_argument("event_id", help="ID of the Gaudeam event to download media from.")
+    download_event_media_parser.add_argument("destination", help="Destination directory to save files.", default=".")
+    
+    download_event_media_days_parser = subparsers.add_parser("download-event-media-days", help="Download all media files from Gaudeam events in the last N days.")
+    download_event_media_days_parser.add_argument("days", type=int, help="Number of days to look back for events.", default=14)
+    download_event_media_days_parser.add_argument("destination", help="Destination directory to save files.", default=".")
     
     upload_parser = subparsers.add_parser("upload", help="Upload files or the content of a folder to a Gaudeam folder.")
     upload_parser.add_argument("folder_id", help="ID of the Gaudeam folder to upload to.")
@@ -124,6 +160,12 @@ def main():
 
         elif args.command == "download":
             download(args.folder_id, Path(args.destination))
+        
+        elif args.command == "download-event-media":
+            download_event_media(args.event_id, Path(args.destination))
+
+        elif args.command == "download-event-media-days":
+            download_event_media_days(args.days, Path(args.destination))
 
         elif args.command == "upload":
             upload(args.folder_id, Path(args.source))
