@@ -529,7 +529,7 @@ class GaudeamResizedImageUploader():
                 return True
         return False
 
-    def delete_duplicates(self, gaudeam_folder: GaudeamDriveFolder, dry_run = False):
+    def delete_duplicates(self, gaudeam_folder: GaudeamDriveFolder, dry_run = False, ask_before_delete = True):
         sub_folders = gaudeam_folder.get_sub_folders()
         sub_folders = sorted(sub_folders, key=lambda f: f.get_name())
 
@@ -542,6 +542,11 @@ class GaudeamResizedImageUploader():
                     # duplicate, eliminate
                     if not dry_run:
                         logging.warning(f"Duplicate folder '{next_folder.get_name()} - deleting'")
+                        if ask_before_delete:
+                            answer = input(f"Do you really want to delete the duplicate folder '{next_folder.get_name()}'? (y/n): ")
+                            if answer.lower() != 'y':
+                                logging.info(f"Skipping deletion of folder '{next_folder.get_name()}'")
+                                continue
                         next_folder.delete()
                     else:
                         logging.info(f"[DRY RUN] Duplicate folder '{next_folder.get_name()}'")
@@ -560,6 +565,11 @@ class GaudeamResizedImageUploader():
                 if first_file.get_name() == next_file.get_name():
                     # duplicate, eliminate
                     if not dry_run:
+                        if ask_before_delete:
+                            answer = input(f"Do you really want to delete the duplicate file '{next_file.get_name()}'? (y/n): ")
+                            if answer.lower() != 'y':
+                                logging.info(f"Skipping deletion of file '{next_file.get_name()}'")
+                                continue
                         logging.warning(f"Duplicate file '{next_file.get_name()} - deleting'")
                         next_file.delete()
                     else:
@@ -571,9 +581,9 @@ class GaudeamResizedImageUploader():
         # now reread and run on the leftover
         sub_folders = gaudeam_folder.get_sub_folders()
         for sub_folder in sub_folders:
-            self.delete_duplicates(sub_folder, dry_run)
+            self.delete_duplicates(sub_folder, dry_run, ask_before_delete)
 
-    def delete_empty_sub_folders(self, gaudeam_folder: GaudeamDriveFolder, dry_run = False):
+    def delete_empty_sub_folders(self, gaudeam_folder: GaudeamDriveFolder, dry_run = False, ask_before_delete = True):
         sub_folders = gaudeam_folder.get_sub_folders()
         if len(sub_folders) > 0:
             # if we have folders we have to go in deep first
@@ -585,13 +595,18 @@ class GaudeamResizedImageUploader():
         if len(sub_folders) + len(files) == 0:
             # empty
             if not dry_run:
+                if ask_before_delete:
+                    answer = input(f"Do you really want to delete the empty folder '{gaudeam_folder.get_name()}'? (y/n): ")
+                    if answer.lower() != 'y':
+                        logging.info(f"Skipping deletion of empty folder '{gaudeam_folder.get_name()}'")
+                        return
                 logging.warning(f"Empty folder: {gaudeam_folder.get_name()} - deleting")
                 gaudeam_folder.delete()
             else:
                 logging.info(f"[DRY RUN] Empty folder: {gaudeam_folder.get_name()}")
             return
 
-    def delete_remote_orphan_files(self, local_folder_path: Path|str, gaudeam_folder: GaudeamDriveFolder, dry_run = False):
+    def delete_remote_orphan_files(self, local_folder_path: Path|str, gaudeam_folder: GaudeamDriveFolder, dry_run = False, ask_before_delete = True):
         local_folder_path = Path(local_folder_path)
         local_sub_folders = [
                             item.name
@@ -610,6 +625,11 @@ class GaudeamResizedImageUploader():
             if gaudeam_sub_folder_name not in local_sub_folders:
                 # folder does not exist locally -> delete
                 if not dry_run:
+                    if ask_before_delete:
+                        answer = input(f"Do you really want to delete the orphan gaudeam folder '{gaudeam_sub_folder_name}' because it's not in {local_folder_path}? (y/n): ")
+                        if answer.lower() != 'y':
+                            logging.info(f"Skipping deletion of gaudeam folder '{gaudeam_sub_folder_name}'")
+                            continue
                     logging.warning(f"Deleting gaudeam folder '{gaudeam_sub_folder_name}' because it's not in {local_folder_path}")
                     gaudeam_sub_folder.delete()
                 else:
@@ -623,6 +643,11 @@ class GaudeamResizedImageUploader():
             gaudeam_sub_file_name = gaudeam_sub_file.get_download_name()
             if gaudeam_sub_file_name not in local_target_file_names:
                 if not dry_run:
+                    if ask_before_delete:
+                        answer = input(f"Do you really want to delete the orphan gaudeam file '{gaudeam_sub_file_name}' because it's not derived from a file in {local_folder_path}? (y/n): ")
+                        if answer.lower() != 'y':
+                            logging.info(f"Skipping deletion of gaudeam file '{gaudeam_sub_file_name}'")
+                            continue
                     logging.warning(f"Deleting gaudeam file '{gaudeam_sub_file_name}' because it's not derived from a file in {local_folder_path}")
                     gaudeam_sub_file.delete()
                 else:
