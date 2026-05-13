@@ -13,7 +13,7 @@ from .drive import GaudeamDriveFolder, GaudeamResizedImageUploader
 from .calendar import GaudeamEvent, GaudeamCalendar
 
 SESSION_PATH = Path.home() / ".igitur_session"
-
+logging.info(f"Using session file at: {SESSION_PATH}")
 
 def login(email: str, password: str) -> GaudeamSession:
     session = GaudeamSession.with_user_auth(email, password)
