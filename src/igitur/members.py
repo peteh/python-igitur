@@ -33,6 +33,12 @@ class GaudeamMember:
     def get_phone(self) -> str:
         return self._properties.get("phone_number", "")
 
+    def get_age(self) -> int:
+        return int(self._properties.get("age", 0))
+
+    def get_birthdate(self) -> str:
+        return self._properties.get("birthdate", "")
+
     def get_property(self, property_name: str):
         return self._properties.get(property_name, None)
 
