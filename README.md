@@ -50,7 +50,7 @@ igitur status
 
 The result will show you what instance you are logged in to and your user account.
 
-```bash
+```text
 Logged in as x@y.de at https://instance.gaudeam.de
 ```
 
@@ -60,6 +60,21 @@ To log out, just use the `logout` command.
 
 ```bash
 igitur logout
+```
+
+### List Members
+
+You can list all members with the `members` command.
+
+```bash
+igitur members
+```
+
+It will list the members with their profile data. 
+
+```text
+Host Horstmann | Email: horst@yourdomain.de | Phone: +49 123 123 123 123
+Max Mustermann | Email: max.mustermann@hahaha.de | Phone: +49 444 5555 6666
 ```
 
 ### Download Folders

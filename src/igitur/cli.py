@@ -11,6 +11,7 @@ logging.basicConfig(level=logging.INFO)
 from .core import IgiturError
 from .drive import GaudeamDriveFolder, GaudeamResizedImageUploader
 from .calendar import GaudeamEvent, GaudeamCalendar
+from .members import GaudeamMembers
 
 SESSION_PATH = Path.home() / ".igitur_session"
 logging.info(f"Using session file at: {SESSION_PATH}")
@@ -50,6 +51,16 @@ def ensure_logged_in() -> GaudeamSession:
     if not session.is_valid():
         raise IgiturError("Session is invalid. Please login again.")
     return session
+
+def members():
+    session = ensure_logged_in()
+    members = GaudeamMembers(session).get_members()
+    for member in members:
+        full_name = f"{member.get_first_name()} {member.get_last_name()}"
+        phone = member.get_phone()
+        email = member.get_email()
+        print(f"{full_name} | Email: {email} | Phone: {phone}")
+    return 0
 
 
 def download(folder_id: str, destination: Path):
@@ -129,6 +140,8 @@ def main():
     logout_parser = subparsers.add_parser("logout", help="Logout and delete session.")
 
     help_parser = subparsers.add_parser("help", help="Show help message.")
+    
+    members_parser = subparsers.add_parser("members", help="Show list of members.")
 
     download_parser = subparsers.add_parser(
         "download", help="Download files from a Gaudeam folder."
@@ -196,6 +209,9 @@ def main():
 
         elif args.command == "status":
             status()
+        
+        elif args.command == "members":
+            members()
 
         elif args.command == "download":
             download(args.folder_id, Path(args.destination))
